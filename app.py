@@ -131,6 +131,7 @@ else:
     st.write(f"### {len(st.session_state.accepted) + len(st.session_state.rejected) + len(st.session_state.ignored)} topics processed!")
     st.write(f"#### Accepted Values: {len(st.session_state.accepted)}")
     # st.write(len(st.session_state.accepted))
+
     st.write(f"#### Rejected Values: {len(st.session_state.rejected)}")
     # st.write(len(st.session_state.rejected))
     st.write(f"#### Ignored Values: {len(st.session_state.ignored)}")
