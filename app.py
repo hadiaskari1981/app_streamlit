@@ -98,8 +98,8 @@ else:
     df_accepted = pd.DataFrame(st.session_state.accepted, columns=["question_answer_id", "answer", "extracted_topic"])
     df_rejected = pd.DataFrame(st.session_state.rejected, columns=["question_answer_id", "answer", "extracted_topic"])
 
-    df_accepted.to_csv(os.path.join(project_abs_path, "app_streamlit/accepted_topics.csv"), index=False)
-    df_rejected.to_csv(os.path.join(project_abs_path, "app_streamlit/rejected_topics.csv"), index=False)
+    # df_accepted.to_csv(os.path.join(project_abs_path, "app_streamlit/accepted_topics.csv"), index=False)
+    # df_rejected.to_csv(os.path.join(project_abs_path, "app_streamlit/rejected_topics.csv"), index=False)
 
 
     labels = ["Accepted", "Rejected"]
@@ -120,3 +120,17 @@ else:
 
     # Display the pie chart
     st.pyplot(fig)
+
+    st.download_button(
+        label="Download Accepted Topics as CSV",
+        data=df_accepted,
+        file_name="accepted_topics.csv",
+        mime="text/csv"
+    )
+
+    st.download_button(
+        label="Download Rejected Topics as CSV",
+        data=df_rejected,
+        file_name="rejected_topics.csv",
+        mime="text/csv"
+    )
