@@ -17,6 +17,7 @@ if "password_correct" not in st.session_state:
 def generate_csv(topics_list):
 
     # Create DataFrames for accepted and rejected topics
+    topics_list = [item[:-1] for item in topics_list]
     dff = pd.DataFrame(topics_list, columns=["extracted_topic", "number_related_answers"])
 
     # accepted_df = pd.DataFrame({"Topic": topics_list, "Status": "Accepted"})
@@ -72,7 +73,13 @@ for i, row in df.iterrows():
 flat_topics = []
 for t, answers  in topics.items():
     nb_answers = len(answers)
-    flat_topics.append((t, (t, nb_answers)))
+    s = ""
+    for a in answers:
+        s += f""" {a}  
+   
+   """
+
+    flat_topics.append((t, (t, nb_answers, s)))
 
 flat_topics.sort(key=lambda x: x[1][1], reverse=True)
 
@@ -110,8 +117,10 @@ if not st.session_state.stopped and st.session_state.current_index < len(flat_to
     topic, topic_nb_answers = flat_topics[st.session_state.current_index]
     with st.container():
 
-        st.markdown(f"""**:blue[extracted topic: ]**  {topic}   
-            **:red[number of related answers : ]**  {topic_nb_answers[1]}""")
+        st.markdown(f"""**:green[Answer(s): ]**   
+        {topic_nb_answers[2]}""")
+        st.markdown(f"""**:blue[Extracted topic: ]**  {topic}   
+            **:red[Number of related answers : ]**  {topic_nb_answers[1]}""")
 
         # Buttons to accept, reject, or stop
         col1, col2, col3, col4 = st.columns(4)
@@ -136,13 +145,6 @@ else:
     # st.write(len(st.session_state.rejected))
     st.write(f"#### Ignored Values: {len(st.session_state.ignored)}")
     # st.write(len(st.session_state.rejected))
-
-    # df_accepted = pd.DataFrame(st.session_state.accepted, columns=["question_answer_id", "answer", "extracted_topic"])
-    # df_rejected = pd.DataFrame(st.session_state.rejected, columns=["question_answer_id", "answer", "extracted_topic"])
-
-    # df_accepted.to_csv(os.path.join(project_abs_path, "app_streamlit/accepted_topics.csv"), index=False)
-    # df_rejected.to_csv(os.path.join(project_abs_path, "app_streamlit/rejected_topics.csv"), index=False)
-
 
     labels = ["Accepted", "Rejected" , "Ignored"]
     sizes = [len(st.session_state.accepted), len(st.session_state.rejected), len(st.session_state.ignored)]
