@@ -200,6 +200,9 @@ else:
 
     # Rotate x-axis labels to be vertical
     plt.xticks(rotation=90)
+    ax.tick_params(axis="x", labelsize=6)  # Smaller font for x-axis ticks
+    ax.tick_params(axis="y", labelsize=6)  # Smaller font for y-axis ticks
+
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
     # Show the plot
@@ -217,6 +220,8 @@ else:
 
     # Rotate x-axis labels to be vertical
     plt.xticks(rotation=90)
+    ax.tick_params(axis="x", labelsize=6)  # Smaller font for x-axis ticks
+    ax.tick_params(axis="y", labelsize=6)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     # Show the plot
     st.pyplot(fig)
