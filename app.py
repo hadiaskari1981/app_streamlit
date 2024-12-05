@@ -15,7 +15,6 @@ if "password_correct" not in st.session_state:
 
 
 def generate_csv(topics_list):
-
     # Create DataFrames for accepted and rejected topics
     topics_list = [item[:-1] for item in topics_list]
     dff = pd.DataFrame(topics_list, columns=["extracted_topic", "number_related_answers"])
@@ -30,11 +29,13 @@ def generate_csv(topics_list):
 
     return csv_data
 
+
 def check_password():
     if st.session_state["password"] == app_password:
         st.session_state.password_correct = True
     else:
         st.error("Incorrect password")
+
 
 if not st.session_state.password_correct:
     st.text_input("Enter the password", type="password", on_change=check_password, key="password")
@@ -44,14 +45,33 @@ project_abs_path = os.path.dirname(os.getcwd())
 print(project_abs_path)
 
 st.title('Accept or Reject the topic')
-@st.cache_data
-def load_date():
-    df = pd.read_csv(os.path.join(project_abs_path, "app_streamlit/test_topic_detection_10_AZ_answers_25_11.csv"))
-    return df
 
-df = load_date()
+
+@st.cache_data
+def load_date(company):
+    if company == 'Aroma-Zone':
+        df_client = pd.read_csv(
+            os.path.join(project_abs_path, "app_streamlit/test_topic_detection_10_AZ_answers_25_11.csv"))
+    else:
+        df_client = pd.read_csv(
+            os.path.join(project_abs_path, "app_streamlit/test_topic_detection_10_klépierre_answers_2_12.csv"))
+
+    df_client = df_client.dropna(subset=["extracted_topics_10"])
+    return df_client
+
+
+dataset_choice = st.radio("Select a client", ("Aroma-Zone", "Klépierre"))
+
+# Load the selected dataset
+
+if dataset_choice == "Aroma-Zone":
+    df = load_date("Aroma-Zone")
+else:
+    df = load_date("Klépierre")
+
 topics = defaultdict(list)
-# topics_list = []
+
+print(df.columns)
 for i, row in df.iterrows():
     qa_id = row["question_answer_id"]
     answer = row["answer"]
@@ -60,30 +80,20 @@ for i, row in df.iterrows():
         continue
     else:
         for t in extracted_topics:
-
             topics[t].append(answer)
 
-            # k = (f"""**:blue[question answerer: ]**  {answer}
-            # **:red[extracted topic: ]**  {t}""")
-            # v = (qa_id, answer, t)
-            # topics_list.append({
-            #     k: v
-            # })
-
 flat_topics = []
-for t, answers  in topics.items():
+for t, answers in topics.items():
     nb_answers = len(answers)
     s = ""
     for a in answers:
-        s += f""" {a}  
-   
+        s += f""" {a.strip()}  
+
    """
 
     flat_topics.append((t, (t, nb_answers, s)))
 
 flat_topics.sort(key=lambda x: x[1][1], reverse=True)
-
-
 
 # flat_topics = [(key, value) for topic in topics for key, value in topic.items()]
 
@@ -102,7 +112,7 @@ if "stopped" not in st.session_state:
 
 # Function to handle button clicks
 def handle_action(action):
-    topic, t_nb_answers = flat_topics[st.session_state.current_index]
+    _, t_nb_answers = flat_topics[st.session_state.current_index]
     if action == "accept":
         st.session_state.accepted.append(t_nb_answers)
     elif action == "reject":
@@ -137,7 +147,8 @@ if not st.session_state.stopped and st.session_state.current_index < len(flat_to
             if st.button("Stop"):
                 st.session_state.stopped = True
 else:
-    st.write(f"### {len(st.session_state.accepted) + len(st.session_state.rejected) + len(st.session_state.ignored)} topics processed!")
+    st.write(
+        f"### {len(st.session_state.accepted) + len(st.session_state.rejected) + len(st.session_state.ignored)} topics processed!")
     st.write(f"#### Accepted Values: {len(st.session_state.accepted)}")
     # st.write(len(st.session_state.accepted))
 
@@ -146,7 +157,7 @@ else:
     st.write(f"#### Ignored Values: {len(st.session_state.ignored)}")
     # st.write(len(st.session_state.rejected))
 
-    labels = ["Accepted", "Rejected" , "Ignored"]
+    labels = ["Accepted", "Rejected", "Ignored"]
     sizes = [len(st.session_state.accepted), len(st.session_state.rejected), len(st.session_state.ignored)]
     colors = ["#4CAF50", "#FF5733", '#eeefff']  # Green for accepted, red for rejected
 
